@@ -2,6 +2,7 @@ import numpy as np
 
 from simplex.Simplex import SimplexMethod
 from task_of_lp.Condtition import Condition
+from task_of_lp.TableService import TableService
 from task_of_lp.Task import Task
 
 
@@ -13,17 +14,20 @@ class BigMMethod:
         self.constraints = constraints
         self.objective_function = objective_function
         self.task = task
+        self.service = TableService()
 
+        table_aspects = self.service.create_table(system, free_variables, constraints,
+                 objective_function, task)
 
-        self.table = None
+        self.table = table_aspects[0]
         self.objective_function_m = None
         self.cnt_row = None
         self.cnt_col = None
 
-        self.basis = None
-        self.slacks = None
-        self.surpluses = None
-        self.artificials = None
+        self.basis = table_aspects[1]
+        self.slacks = table_aspects[2]
+        self.surpluses = table_aspects[4]
+        self.artificials = table_aspects[5]
 
     def create_table(self):
         self.cnt_row = self.system.shape[0]

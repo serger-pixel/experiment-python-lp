@@ -1,5 +1,6 @@
 import numpy as np
-from typing import List
+
+from task_of_lp.TableService import TableService
 
 
 class SimplexMethod:
@@ -8,6 +9,7 @@ class SimplexMethod:
         self.cnt_row = table.shape[0]
         self.cnt_col = table.shape[1]
         self.basis = basis
+        self.service = TableService(table, basis)
 
     def find_column(self, ind):
         last_row = self.table[ind, :-1]
@@ -44,34 +46,6 @@ class SimplexMethod:
 
         self.basis[row] = column
 
-    def print_row(self, ind, row_header):
-        row = row_header
-        for j in range(self.cnt_col):
-            row += f"{self.table[ind, j]:6.2f} "
-        print(row)
-
-    def print_table(self, without):
-        print("\nСимплекс-таблица:")
-        print("-" * 60)
-        header = "Базис | "
-        for i in range(self.cnt_col - 1):
-            header += f"     x{i}"
-        header += "|  b  "
-        print(header)
-        print("-" * 60)
-
-        for i in range(self.basis.shape[0]):
-            row = f"  x {self.basis[i]} | "
-            for j in range(self.cnt_col):
-                row += f"{self.table[i, j]:6.2f} "
-            print(row)
-        print("-" * 60)
-
-        for i in range(self.cnt_row - self.basis.shape[0] - without):
-            self.print_row(-i, "Z")
-
-
-
     def solve(self, without, ind, is_optimal_header):
         """
         :param without: кол-во невыводящих строк с конца
@@ -80,7 +54,7 @@ class SimplexMethod:
         :return: решение задачи, строку под индексом ind
         """
         print("=" * 60)
-        self.print_table(without)
+        self.service.print_table(without)
 
         while True:
             column = self.find_column(ind)
@@ -99,11 +73,9 @@ class SimplexMethod:
                 print("\nЗадача неограничена!")
                 return False, None, None
 
-            print(f"\n------------------------")
-            print(f"Разрешающий столбец: {column + 1}")
-            print(f"Разрешающая строка: {row + 1}")
+            self.service.print_pivot(row, column)
             self.step(row, column)
-            self.print_table(without)
+            self.service.print_table(without)
 
 
 
